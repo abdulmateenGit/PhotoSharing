@@ -12,6 +12,7 @@
     "@expo/metro-config": "~54.0.2",
     "babel-preset-expo": "~54.0.0",
     "expo": "~54.0.9",
+    "expo-camera": "~17.0.8",
     "expo-constants": "~18.0.9",
     "expo-linking": "~8.0.8",
     "expo-router": "~6.0.7",
