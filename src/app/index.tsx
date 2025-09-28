@@ -4,9 +4,12 @@ import { Link } from "expo-router";
 
 export default function Home() {
   return (
-    <View className="flex-1 items-center justify-center bg-neutral-600">
+    <View className="flex-1 items-center justify-center bg-neutral-600 gap-4">
       <Link href="/camera" className="text-white">
         Open Camera
+      </Link>
+      <Link href="/event" className="text-white">
+        Event Details
       </Link>
     </View>
   );

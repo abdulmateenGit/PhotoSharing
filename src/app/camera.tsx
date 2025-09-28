@@ -10,8 +10,9 @@ import {
   View,
 } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { uploadToCloudinary } from "../lib/cloundinary";
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -40,9 +41,10 @@ export default function CameraScreen() {
   }
 
   async function takePhoto() {
-    console.log("takePhoto");
     const photo = await camera.current?.takePictureAsync();
-    console.log(JSON.stringify(photo, null, 2));
+    if (!photo?.uri) return;
+    const cloundinaryResponse = await uploadToCloudinary(photo.uri);
+    console.log(JSON.stringify(cloundinaryResponse, null, 2));
   }
 
   return (
