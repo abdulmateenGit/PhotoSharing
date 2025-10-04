@@ -1,20 +1,27 @@
-import { View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "../providers/AuthProvider";
+import { ActivityIndicator, Text, FlatList } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { getEvents } from "../services/events";
+import EventListItem from "../components/EventListItem";
 
 export default function Home() {
-  const { isAuthenticated, user } = useAuth();
-  console.log("User:", user, "Authenticated:", isAuthenticated);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
   return (
-    <View className="flex-1 items-center justify-center bg-neutral-600 gap-4">
-      <Link href="/camera" className="text-white">
-        Open Camera
-      </Link>
-      <Link href="/event" className="text-white">
-        Event Details
-      </Link>
-    </View>
+    <FlatList
+      data={data}
+      contentContainerClassName="gap-4 p-4"
+      renderItem={({ item }) => <EventListItem event={item} />}
+      contentInsetAdjustmentBehavior="automatic"
+    />
   );
 }
