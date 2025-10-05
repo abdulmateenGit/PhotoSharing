@@ -22,7 +22,15 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="camera"
+              name="events/[id]/index"
+              options={{
+                title: "Event",
+                headerLargeTitle: true,
+                headerBackButtonDisplayMode: "minimal",
+              }}
+            />
+            <Stack.Screen
+              name="events/[id]/camera"
               options={{
                 title: "Camera",
                 headerBackButtonDisplayMode: "minimal",

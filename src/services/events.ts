@@ -8,3 +8,13 @@ export async function getEvents() {
     .throwOnError();
   return data;
 }
+
+export async function getEventById(id: string) {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*, assets(*)")
+      .eq("id", id)
+      .single()
+      .throwOnError();
+    return data;
+}

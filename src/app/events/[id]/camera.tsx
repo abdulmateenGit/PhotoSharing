@@ -1,22 +1,38 @@
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { useState, useRef } from "react";
+import { useState, useRef, use } from "react";
 import {
   ActivityIndicator,
   Button,
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { uploadToCloudinary } from "../lib/cloundinary";
+import { uploadToCloudinary } from "@/lib/cloundinary";
+import { useLocalSearchParams } from "expo-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { insertAsset } from "@/services/assets";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const insertAssetMutation = useMutation({
+    mutationFn: (assetId: string) =>
+      insertAsset({ event_id: id, user_id: user?.id, asset_id: assetId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+
   const camera = useRef<CameraView>(null);
 
   if (!permission) {
@@ -43,8 +59,12 @@ export default function CameraScreen() {
   async function takePhoto() {
     const photo = await camera.current?.takePictureAsync();
     if (!photo?.uri) return;
+
     const cloundinaryResponse = await uploadToCloudinary(photo.uri);
     console.log(JSON.stringify(cloundinaryResponse, null, 2));
+
+    // save it to the database assets table with event id
+    insertAssetMutation.mutate(cloundinaryResponse.public_id);
   }
 
   return (
