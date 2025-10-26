@@ -1,5 +1,5 @@
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { useState, useRef, use } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -8,7 +8,6 @@ import {
   Text,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { uploadToCloudinary } from "@/lib/cloundinary";
@@ -17,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { insertAsset } from "@/services/assets";
 import { useAuth } from "@/providers/AuthProvider";
 
-export default function CameraScreen() {
+export default function App() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -29,7 +28,7 @@ export default function CameraScreen() {
     mutationFn: (assetId: string) =>
       insertAsset({ event_id: id, user_id: user?.id, asset_id: assetId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["event", id] });
+      queryClient.invalidateQueries({ queryKey: ["events", id] });
     },
   });
 
@@ -59,14 +58,11 @@ export default function CameraScreen() {
   async function takePhoto() {
     const photo = await camera.current?.takePictureAsync();
     if (!photo?.uri) return;
+    const cloudinaryResponse = await uploadToCloudinary(photo.uri);
 
-    const cloundinaryResponse = await uploadToCloudinary(photo.uri);
-    console.log(JSON.stringify(cloundinaryResponse, null, 2));
-
-    // save it to the database assets table with event id
-    insertAssetMutation.mutate(cloundinaryResponse.public_id);
+    insertAssetMutation.mutate(cloudinaryResponse.public_id);
+    //save the photo to the database in assets table
   }
-
   return (
     <View style={styles.container}>
       <CameraView ref={camera} style={styles.camera} facing={facing}>
@@ -79,14 +75,15 @@ export default function CameraScreen() {
           />
         </View>
       </CameraView>
-      {/* Footer */}
+
+      {/* Footer with Camera Control */}
       <SafeAreaView
         edges={["bottom"]}
-        className="flex-row bg-transparent w-full p-10 justify-center items-center"
+        className="w-full flex-row justify-center items-centers bg-transparent p-4 pb-10"
       >
         <Pressable
           onPress={takePhoto}
-          className="bg-white rounded-full w-20 h-20"
+          className="bg-white rounded-full h-20 w-20"
         />
       </SafeAreaView>
     </View>
@@ -104,15 +101,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    backgroundColor: "red",
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 64,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    width: "100%",
-    paddingHorizontal: 64,
+    backgroundColor: "gray",
   },
   button: {
     flex: 1,

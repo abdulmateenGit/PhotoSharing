@@ -6,26 +6,31 @@ import {
   View,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { getEvents } from "../services/events";
+import { getEventsforUser } from "../services/event";
 import EventListItem from "../components/EventListItem";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Home() {
+  const { user } = useAuth();
   const { data, isLoading, error } = useQuery({
     queryKey: ["events"],
-    queryFn: getEvents,
+    queryFn: () => getEventsforUser(user!.id),
   });
 
   if (isLoading) {
-    <View className="flex-1 items-center justify-center">
-      return <ActivityIndicator />;
-    </View>;
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   if (error) {
-    return <Text>Error: {error.message}</Text>;
+    return <Text className="text-red-500">Error: {error.message}</Text>;
   }
+
   return (
     <FlatList
       data={data}
@@ -34,10 +39,10 @@ export default function Home() {
       contentInsetAdjustmentBehavior="automatic"
       ListHeaderComponent={() => (
         <Link href="/events/create" asChild>
-          <Pressable className="bg-purple-800 p-4 rounded-lg items-center justify-center flex-row gap-2">
+          <Pressable className="bg-purple-800 gap-2 p-4 rounded-lg m-2 items-center flex-row justify-center">
             <Ionicons name="add-outline" size={24} color="white" />
             <Text className="text-white text-lg font-semibold">
-              Create Event
+              Create New Event
             </Text>
           </Pressable>
         </Link>

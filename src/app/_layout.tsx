@@ -1,6 +1,6 @@
 import "../../global.css";
 import { Link, Stack } from "expo-router";
-import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { ThemeProvider, DarkTheme } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import AuthProvider from "../providers/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,21 +13,11 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Stack>
-            <Stack.Screen
-              name="index"
-              options={{
-                title: "Events",
-                headerLargeTitle: true,
-                // headerTransparent: true,
-              }}
-            />
+            <Stack.Screen name="index" options={{ title: "Events" }} />
+
             <Stack.Screen
               name="events/[id]/index"
-              options={{
-                title: "Events",
-                headerLargeTitle: true,
-                headerBackButtonDisplayMode: "minimal",
-              }}
+              options={{ title: "Event" }}
             />
 
             <Stack.Screen
@@ -36,20 +26,22 @@ export default function RootLayout() {
                 title: "Camera",
                 headerBackButtonDisplayMode: "minimal",
                 headerTransparent: true,
-                headerBlurEffect: "dark",
-                headerRight: () => (
-                  <Link href="/" className="mr-2 ml-2">
-                    <Ionicons name="share-outline" size={24} color="white" />
-                  </Link>
-                ),
               }}
             />
+
+            <Stack.Screen
+              name="events/[id]/share"
+              options={{ title: "Share", presentation: "modal" }}
+            />
+
+            <Stack.Screen
+              name="events/[id]/join"
+              options={{ title: "Join Event", presentation: "modal" }}
+            />
+
             <Stack.Screen
               name="events/create"
-              options={{
-                title: "Create Event",
-                presentation: "modal",
-              }}
+              options={{ title: "Create Event", presentation: "modal" }}
             />
           </Stack>
         </AuthProvider>

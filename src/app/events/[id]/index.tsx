@@ -1,28 +1,30 @@
 import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  Text,
   View,
+  Text,
+  ActivityIndicator,
+  Pressable,
+  FlatList,
 } from "react-native";
+
 import { Link, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { getEventById } from "@/services/events";
+import { getEvent } from "@/services/event";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AssetItem from "@/components/AssetItem";
 
 export default function EventDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+
   const {
     data: event,
-    isLoading,
     error,
+    isLoading,
     isRefetching,
     refetch,
   } = useQuery({
     queryKey: ["events", id],
-    queryFn: () => getEventById(id),
+    queryFn: () => getEvent(id),
   });
 
   if (isLoading) {
@@ -30,7 +32,7 @@ export default function EventDetails() {
   }
 
   if (error) {
-    return <Text>Error: {error.message}</Text>;
+    return <Text className="text-white">Error: {error.message}</Text>;
   }
 
   if (!event) {
@@ -38,9 +40,22 @@ export default function EventDetails() {
   }
 
   return (
-    <>
-      <Stack.Screen options={{ title: event.name }} />
-
+    <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: event.name,
+          headerRight: () => (
+            <Link href={`events/${id}/share`} asChild>
+              <Ionicons
+                name="share-outline"
+                size={24}
+                color="white"
+                className="mr-2 ml-2"
+              />
+            </Link>
+          ),
+        }}
+      />
       <FlatList
         data={event.assets}
         numColumns={2}
@@ -51,12 +66,11 @@ export default function EventDetails() {
         refreshing={isRefetching}
         onRefresh={refetch}
       />
-
-      <Link href={`/events/${id}/camera`} asChild>
-        <Pressable className="absolute bottom-16 right-4 flex-row items-center justify-center bg-white p-6 rounded-full">
-          <Ionicons name="camera-outline" size={40} color="black" />
+      <Link href={`events/${id}/camera`} asChild>
+        <Pressable className="absolute bottom-32 right-12 flex-row justify-center items-center p-4 bg-white rounded-full">
+          <Ionicons name="camera-outline" size={30} color="black" />
         </Pressable>
       </Link>
-    </>
+    </View>
   );
 }
