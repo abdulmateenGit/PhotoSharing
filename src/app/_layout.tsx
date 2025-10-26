@@ -24,11 +24,12 @@ export default function RootLayout() {
             <Stack.Screen
               name="events/[id]/index"
               options={{
-                title: "Event",
+                title: "Events",
                 headerLargeTitle: true,
                 headerBackButtonDisplayMode: "minimal",
               }}
             />
+
             <Stack.Screen
               name="events/[id]/camera"
               options={{
@@ -41,6 +42,13 @@ export default function RootLayout() {
                     <Ionicons name="share-outline" size={24} color="white" />
                   </Link>
                 ),
+              }}
+            />
+            <Stack.Screen
+              name="events/create"
+              options={{
+                title: "Create Event",
+                presentation: "modal",
               }}
             />
           </Stack>

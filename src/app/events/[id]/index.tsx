@@ -21,7 +21,7 @@ export default function EventDetails() {
     isRefetching,
     refetch,
   } = useQuery({
-    queryKey: ["event", id],
+    queryKey: ["events", id],
     queryFn: () => getEventById(id),
   });
 
